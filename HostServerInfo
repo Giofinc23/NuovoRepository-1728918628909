@@ -1,0 +1,40 @@
+using System;
+using System.Linq;
+using System.Net;
+
+
+namespace Conte.Car.Website.Cj.Helper
+{
+    public sealed class HostServerInfo
+    {
+        public static readonly string HostServerIp;
+        static HostServerInfo()
+        {
+            HostServerIp = GetHostServerIp();
+        }
+        private static string GetHostServerIp()
+        {
+            var hostIp = string.Empty;
+            char[] spearator = { ',', ';' };
+            try
+            {
+                var HostName = Dns.GetHostName();
+                var ipaddresses = Dns.GetHostAddresses(HostName);
+                var ipaddress4 = ipaddresses.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).FirstOrDefault();
+                if (ipaddress4 == null)
+                {
+                    var ip6 = ipaddresses.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6).FirstOrDefault();
+                    hostIp= (ip6 == null)? HostName: ip6.ToString().Split(spearator)[0];
+                }
+                else
+                    hostIp = ipaddress4.ToString().Split(spearator)[0];
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return hostIp;
+        }
+    }
+}
